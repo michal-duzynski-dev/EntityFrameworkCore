@@ -37,6 +37,25 @@ public class MoviesController : Controller
         return rsp == null ? NotFound() : Ok(rsp);
     }
     
+    [HttpGet("by-year/{year:int}")]
+    [ProducesResponseType(typeof(List<Movie>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAllByYear([FromRoute] int year)
+    {
+        var rsp = await _context.Movies.Where(m => m.ReleaseDate.Year == year).ToListAsync();
+        return Ok(rsp);
+    }
+    
+    [HttpGet("titles-by-year/{year:int}")]
+    [ProducesResponseType(typeof(List<Movie>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetTitlesAllByYear([FromRoute] int year)
+    {
+        var rsp = await _context.Movies
+            .Where(m => m.ReleaseDate.Year == year)
+            .Select(m => new MovieTitle { Id = m.Id, Title = m.Title }).ToListAsync();
+        
+        return Ok(rsp);
+    }
+    
     [HttpPost]
     [ProducesResponseType(typeof(Movie), StatusCodes.Status201Created)]
     public async Task<IActionResult> Create([FromBody] Movie movie)
@@ -74,7 +93,7 @@ public class MoviesController : Controller
         if (oldMovie != null)
             return NotFound();
         
-        _context.Movies.Remove(oldMovie);
+        _context.Movies.Remove(oldMovie!);
  
         await _context.SaveChangesAsync();
         return Ok();

@@ -7,6 +7,7 @@ public class MoviesContext : DbContext
 {
     private readonly IConfiguration _configuration;
     public DbSet<Movie> Movies => Set<Movie>();
+    public DbSet<Genre> Genres => Set<Genre>();
 
     public MoviesContext(DbContextOptions<MoviesContext> options, IConfiguration configuration) : base(options)
     {
@@ -16,6 +17,10 @@ public class MoviesContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseSqlServer(_configuration.GetConnectionString("DefaultConnection"));
+        
+        // Full EF log - only for debugging
+        optionsBuilder.LogTo(Console.WriteLine);
+        
         base.OnConfiguring(optionsBuilder);
     }
 }
