@@ -5,11 +5,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EFCore.API.Controllers;
 
-public class GenresConroller : Controller
+[ApiController]
+[Route("[controller]")]
+public class GenresController : ControllerBase
 {
     private readonly MoviesContext _context;
 
-    public GenresConroller(MoviesContext context)
+    public GenresController(MoviesContext context)
     {
         _context = context;
     }

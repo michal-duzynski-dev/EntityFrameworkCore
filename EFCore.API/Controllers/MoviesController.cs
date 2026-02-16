@@ -32,10 +32,25 @@ public class MoviesController : Controller
         //var rsp = await _context.Movies.SingleOrDefaultAsync(m =>m.Id == id);
         
         // Build in ef cache
-        var rsp = await _context.Movies.FindAsync(id);
+        var rsp = await _context.Movies
+            .Include(g => g.Genre)
+            .SingleOrDefaultAsync(m => m.Id == id);
         
         return rsp == null ? NotFound() : Ok(rsp);
     }
+    
+    [HttpGet("until-age/{ageRating}")]
+    [ProducesResponseType(typeof(List<MovieTitle>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAllUntilAge([FromRoute] AgeRating ageRating)
+    {
+        var rsp = await _context.Movies
+            .Where(m => m.AgeRating <= ageRating)
+            .Select(m => new MovieTitle { Id = m.Id, Title = m.Title })
+            .ToListAsync();
+        
+        return Ok(rsp);
+    }
+    
     
     [HttpGet("by-year/{year:int}")]
     [ProducesResponseType(typeof(List<Movie>), StatusCodes.Status200OK)]
@@ -46,7 +61,7 @@ public class MoviesController : Controller
     }
     
     [HttpGet("titles-by-year/{year:int}")]
-    [ProducesResponseType(typeof(List<Movie>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(List<MovieTitle>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetTitlesAllByYear([FromRoute] int year)
     {
         var rsp = await _context.Movies

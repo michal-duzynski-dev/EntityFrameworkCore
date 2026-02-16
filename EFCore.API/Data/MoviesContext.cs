@@ -1,4 +1,5 @@
-﻿using EFCore.API.Models;
+﻿using EFCore.API.EntityMapping;
+using EFCore.API.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace EFCore.API.Data;
@@ -22,5 +23,13 @@ public class MoviesContext : DbContext
         optionsBuilder.LogTo(Console.WriteLine);
         
         base.OnConfiguring(optionsBuilder);
+    }
+    
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfiguration(new MovieMapping());
+        modelBuilder.ApplyConfiguration(new GenreMapping());
+    
     }
 }
